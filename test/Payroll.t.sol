@@ -134,7 +134,7 @@ contract PayrollTest is Test {
         vm.prank(alice);
         vm.expectEmit(true, true, true, true);
         emit AmountWithdrawn(alice, expectedAmount);
-        payroll.withdraw();
+        payroll.withdraw(expectedAmount);
 
         uint256 treasuryAfter = dola.balanceOf(treasury);
         uint256 aliceAfter = dola.balanceOf(alice);

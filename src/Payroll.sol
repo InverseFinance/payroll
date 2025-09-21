@@ -70,14 +70,14 @@ contract Payroll {
     /**
     * @notice withdraw salary
     */
-    function withdraw() external {
+    function withdraw(uint256 amount) external {
         updateRecipient(msg.sender);
 
-        uint256 amount = unclaimed[msg.sender];
-        unclaimed[msg.sender] = 0;        
-        require(DOLA.transferFrom(treasuryAddress, msg.sender, amount), "DolaPayroll::withdraw: transfer failed");
+        uint256 withdrawAmount = unclaimed[msg.sender] > amount ? amount : unclaimed[msg.sender];
+        unclaimed[msg.sender] -= withdrawAmount;
+        require(DOLA.transferFrom(treasuryAddress, msg.sender, withdrawAmount), "DolaPayroll::withdraw: transfer failed");
 
-        emit AmountWithdrawn(msg.sender, amount);
+        emit AmountWithdrawn(msg.sender, withdrawAmount);
     }
 
 }
