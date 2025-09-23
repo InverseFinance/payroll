@@ -167,4 +167,29 @@ contract PayrollTest is Test {
         // 100*10 (old) + 50*20 (new)
         assertEq(bal, (10 * 100) + (20 * 50));
     }
+
+    function test_rehire_after_expired_payroll() public {
+        uint256 startTime = 7_000_000;
+        vm.warp(startTime);
+
+        uint256 salary = 365 days * 10; // 10 tokens per second
+        uint256 endTime = startTime + 400; // expires after 400 seconds
+
+        // Set up payroll for alice
+        vm.prank(governance);
+        payroll.setRecipient(alice, salary, endTime);
+
+        // Warp far past expiration
+        vm.warp(startTime + 1000);
+
+        // User withdraws earned amount - this triggers updateRecipient
+        // setting lastClaim to current time (past endTime)
+        vm.prank(alice);
+        payroll.withdraw(4000); // full earned amount: 10 tokens/sec * 400 sec
+
+        // Attempt to rehire alice - this should fail if bug exists
+        // because balanceOf will underflow (endTime - lastClaim where lastClaim > endTime)
+        vm.prank(governance);
+        payroll.setRecipient(alice, salary, startTime + 2000);
+    }
 }
