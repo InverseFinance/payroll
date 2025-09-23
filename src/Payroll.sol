@@ -22,7 +22,6 @@ contract Payroll {
     }
 
     event SetRecipient(address recipient, uint256 amount, uint256 endTime);
-    event RecipientRemoved(address recipient);
     event AmountWithdrawn(address recipient, uint256 amount);
 
     constructor(address _treasuryAddress, address _governance, address _DOLA) {
