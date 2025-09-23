@@ -34,13 +34,9 @@ contract Payroll {
     function balanceOf(address _recipient) public view returns (uint256 bal) {
         bal = unclaimed[_recipient];
         Recipient memory recipient = recipients[_recipient];
-        if (recipient.endTime > block.timestamp) {
-            // recipient is still active
-            bal += recipient.ratePerSecond * (block.timestamp - recipient.lastClaim);
-        } else {
-            // recipient is no longer active
-            bal += recipient.ratePerSecond * (recipient.endTime - recipient.lastClaim);
-        }
+        uint256 accrualEnd = block.timestamp < recipient.endTime ? block.timestamp : recipient.endTime;
+        uint256 accrualStart = recipient.lastClaim < accrualEnd ? recipient.lastClaim : accrualEnd;
+        bal += recipient.ratePerSecond * (accrualEnd - accrualStart);
     }
 
     function updateRecipient(address recipient) internal {
@@ -53,7 +49,7 @@ contract Payroll {
         require(msg.sender == governance, "DolaPayroll::setRecipient: only governance");
         require(_recipient != address(0), "DolaPayroll::setRecipient: zero address!");
 
-        // if endTime is in the past, set it to the current block timestamp to avoid underflow in balanceOf
+        // endTime cannot be in the past
         if(_endTime < block.timestamp) {
             _endTime = block.timestamp;
         }
