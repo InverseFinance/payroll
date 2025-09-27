@@ -36,20 +36,20 @@ contract PayrollTest is Test {
     function test_constructor_sets_immutables() public {
         assertEq(payroll.treasuryAddress(), treasury);
         assertEq(payroll.governance(), governance);
-        assertEq(address(payroll.DOLA()), address(dola));
+        assertEq(address(payroll.asset()), address(dola));
     }
 
     function test_setRecipient_only_governance() public {
         uint256 endTime = block.timestamp + 10;
         vm.prank(alice);
-        vm.expectRevert(bytes("DolaPayroll::setRecipient: only governance"));
+        vm.expectRevert(bytes("Payroll::setRecipient: only governance"));
         payroll.setRecipient(alice, 100, endTime);
     }
 
     function test_setRecipient_zero_address_reverts() public {
         uint256 endTime = block.timestamp + 10;
         vm.prank(governance);
-        vm.expectRevert(bytes("DolaPayroll::setRecipient: zero address!"));
+        vm.expectRevert(bytes("Payroll::setRecipient: zero address!"));
         payroll.setRecipient(address(0), 100, endTime);
     }
 

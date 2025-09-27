@@ -11,7 +11,7 @@ contract Payroll {
 
     address public immutable treasuryAddress;
     address public immutable governance;
-    IERC20 public immutable DOLA;
+    IERC20 public immutable asset;
     
     uint256 public constant SECONDS_PER_YEAR = 365 days;
 
@@ -24,10 +24,10 @@ contract Payroll {
     event SetRecipient(address recipient, uint256 amount, uint256 endTime);
     event AmountWithdrawn(address recipient, uint256 amount);
 
-    constructor(address _treasuryAddress, address _governance, address _DOLA) {
+    constructor(address _treasuryAddress, address _governance, address _asset) {
         treasuryAddress = _treasuryAddress;
         governance = _governance;
-        DOLA = IERC20(_DOLA);
+        asset = IERC20(_asset);
     }
 
     function balanceOf(address _recipient) public view returns (uint256 bal) {
@@ -45,8 +45,8 @@ contract Payroll {
 
     function setRecipient(address _recipient, uint256 _yearlyAmount, uint256 _endTime) external {
         updateRecipient(_recipient);
-        require(msg.sender == governance, "DolaPayroll::setRecipient: only governance");
-        require(_recipient != address(0), "DolaPayroll::setRecipient: zero address!");
+        require(msg.sender == governance, "Payroll::setRecipient: only governance");
+        require(_recipient != address(0), "Payroll::setRecipient: zero address!");
 
         // endTime cannot be in the past
         if(_endTime < block.timestamp) {
@@ -70,7 +70,7 @@ contract Payroll {
 
         uint256 withdrawAmount = unclaimed[msg.sender] > amount ? amount : unclaimed[msg.sender];
         unclaimed[msg.sender] -= withdrawAmount;
-        require(DOLA.transferFrom(treasuryAddress, msg.sender, withdrawAmount), "DolaPayroll::withdraw: transfer failed");
+        require(asset.transferFrom(treasuryAddress, msg.sender, withdrawAmount), "Payroll::withdraw: transfer failed");
 
         emit AmountWithdrawn(msg.sender, withdrawAmount);
     }
