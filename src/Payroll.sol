@@ -2,8 +2,10 @@ pragma solidity 0.8.13;
 
 interface IERC20 {
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
+    function decimals() external view returns (uint8);
 }
 
+// WARNING: THIS CONTRACT IS NOT COMPATIBLE WITH NON-STANDARD ERC20 TOKENS (e.g. USDT)
 contract Payroll {
 
     mapping(address => Recipient) public recipients;
@@ -25,6 +27,7 @@ contract Payroll {
     event AmountWithdrawn(address recipient, uint256 amount);
 
     constructor(address _treasuryAddress, address _governance, address _asset) {
+        require(IERC20(_asset).decimals() == 18, "Payroll::constructor: asset must have 18 decimals");
         treasuryAddress = _treasuryAddress;
         governance = _governance;
         asset = IERC20(_asset);
