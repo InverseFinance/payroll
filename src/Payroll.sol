@@ -23,8 +23,8 @@ contract Payroll {
         uint256 endTime;
     }
 
-    event SetRecipient(address recipient, uint256 amount, uint256 endTime);
-    event AmountWithdrawn(address recipient, uint256 amount);
+    event SetRecipient(address indexed recipient, uint256 amount, uint256 endTime);
+    event AmountWithdrawn(address indexed recipient, uint256 amount);
 
     constructor(address _treasuryAddress, address _governance, address _asset) {
         require(IERC20(_asset).decimals() == 18, "Payroll::constructor: asset must have 18 decimals");
